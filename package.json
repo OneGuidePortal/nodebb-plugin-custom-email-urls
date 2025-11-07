@@ -22,12 +22,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/peterseymour/nodebb-plugin-custom-email-urls.git"
+    "url": "git+https://github.com/OneGuidePortal/nodebb-plugin-custom-email-urls.git"
   },
   "bugs": {
-    "url": "https://github.com/peterseymour/nodebb-plugin-custom-email-urls/issues"
+    "url": "https://github.com/OneGuidePortal/nodebb-plugin-custom-email-urls/issues"
   },
-  "homepage": "https://github.com/peterseymour/nodebb-plugin-custom-email-urls#readme",
+  "homepage": "https://github.com/OneGuidePortal/nodebb-plugin-custom-email-urls#readme",
   "engines": {
     "node": ">=14.0.0"
   },
