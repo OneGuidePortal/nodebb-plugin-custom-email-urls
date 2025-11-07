@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1] - 2025-11-06
+
+### Changed
+- Updated NodeBB compatibility to support v4.x (including v4.6.x)
+- Updated compatibility string to `^3.0.0 || ^4.0.0`
+
+### Confirmed
+- Admin UI is fully functional with three configuration fields
+- Settings are properly saved and loaded via NodeBB settings API
+
 ## [0.1.0] - 2025-11-06
 
 ### Added

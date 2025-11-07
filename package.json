@@ -32,7 +32,7 @@
     "node": ">=14.0.0"
   },
   "nbbpm": {
-    "compatibility": "^3.0.0"
+    "compatibility": "^3.0.0 || ^4.0.0"
   },
   "peerDependencies": {
     "nodebb": ">=3.0.0"
