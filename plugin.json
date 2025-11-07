@@ -1,0 +1,22 @@
+{
+  "id": "nodebb-plugin-custom-email-urls",
+  "name": "Custom Email URLs",
+  "description": "Override NodeBB email URLs to point to custom React frontend",
+  "url": "",
+  "library": "./library.js",
+  "hooks": [
+    {
+      "hook": "filter:email.send",
+      "method": "rewriteEmailUrls"
+    },
+    {
+      "hook": "filter:admin.header.build",
+      "method": "addAdminNavigation"
+    }
+  ],
+  "scripts": [],
+  "staticDirs": {},
+  "templates": "./templates",
+  "languages": "./languages",
+  "acpScripts": []
+}

@@ -1,0 +1,40 @@
+{
+  "name": "nodebb-plugin-custom-email-urls",
+  "version": "0.1.0",
+  "description": "NodeBB plugin to rewrite email URLs to point to custom frontend (React, Vue, etc.) instead of NodeBB UI",
+  "main": "library.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "nodebb",
+    "plugin",
+    "email",
+    "url",
+    "frontend",
+    "custom",
+    "react",
+    "rewrite",
+    "notifications",
+    "headless"
+  ],
+  "author": "Peter Seymour",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peterseymour/nodebb-plugin-custom-email-urls.git"
+  },
+  "bugs": {
+    "url": "https://github.com/peterseymour/nodebb-plugin-custom-email-urls/issues"
+  },
+  "homepage": "https://github.com/peterseymour/nodebb-plugin-custom-email-urls#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "nbbpm": {
+    "compatibility": "^3.0.0"
+  },
+  "peerDependencies": {
+    "nodebb": ">=3.0.0"
+  }
+}
