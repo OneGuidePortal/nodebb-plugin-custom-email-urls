@@ -26,6 +26,5 @@
   "staticDirs": {
     "static": "./static"
   },
-  "templates": "./templates",
-  "languages": "./languages"
+  "templates": "./templates"
 }
