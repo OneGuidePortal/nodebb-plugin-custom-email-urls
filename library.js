@@ -59,7 +59,8 @@ function replaceUrls(content, fromUrl, toUrl, settings) {
 	}
 
 	// Define URL mappings for different NodeBB paths
-	const urlMappings = settings.urlMappings ? parseUrlMappings(settings.urlMappings) : getDefaultUrlMappings();
+	// Use individual mapping fields if available, otherwise fall back to urlMappings textarea
+	const urlMappings = buildUrlMappings(settings);
 
 	// Apply custom mappings
 	let result = content;
@@ -109,6 +110,40 @@ function getDefaultUrlMappings() {
 }
 
 /**
+ * Build URL mappings from individual settings fields
+ */
+function buildUrlMappings(settings) {
+	const mappings = {};
+
+	// Map individual fields to their NodeBB paths
+	const fieldMap = {
+		mapping_topic: '/topic/',
+		mapping_post: '/post/',
+		mapping_user: '/user/',
+		mapping_category: '/category/',
+		mapping_notifications: '/notifications',
+		mapping_unsubscribe: '/unsubscribe/',
+		mapping_reset: '/reset/',
+		mapping_register: '/register',
+		mapping_login: '/login',
+		mapping_tags: '/tags/',
+		mapping_groups: '/groups/',
+	};
+
+	// Build mappings from settings, using defaults if not set
+	const defaults = getDefaultUrlMappings();
+	for (const [fieldName, nodebbPath] of Object.entries(fieldMap)) {
+		if (settings[fieldName] && settings[fieldName].trim()) {
+			mappings[nodebbPath] = settings[fieldName].trim();
+		} else {
+			mappings[nodebbPath] = defaults[nodebbPath];
+		}
+	}
+
+	return mappings;
+}
+
+/**
  * Parse custom URL mappings from settings
  * Format: nodebb_path=custom_path (one per line)
  */
@@ -149,6 +184,24 @@ plugin.addAdminNavigation = async function (header) {
 	});
 
 	return header;
+};
+
+/**
+ * Initialize plugin and register admin routes
+ */
+plugin.init = function (params, callback) {
+	const { router, middleware } = params;
+
+	const renderAdmin = function (req, res) {
+		res.render('admin/plugins/custom-email-urls', {
+			title: 'Custom Email URLs',
+		});
+	};
+
+	router.get('/admin/plugins/custom-email-urls', middleware.admin.buildHeader, renderAdmin);
+	router.get('/api/admin/plugins/custom-email-urls', renderAdmin);
+
+	callback();
 };
 
 module.exports = plugin;
