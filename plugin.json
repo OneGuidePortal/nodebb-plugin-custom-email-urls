@@ -6,8 +6,9 @@
   "library": "./library.js",
   "hooks": [
     {
-      "hook": "filter:email.send",
-      "method": "rewriteEmailUrls"
+      "hook": "filter:email.modify",
+      "method": "rewriteEmailUrls",
+      "priority": 1
     },
     {
       "hook": "filter:admin.header.build",
@@ -19,8 +20,12 @@
     }
   ],
   "scripts": [],
-  "staticDirs": {},
+  "modules": {
+    "../admin/plugins/custom-email-urls.js": "static/lib/admin.js"
+  },
+  "staticDirs": {
+    "static": "./static"
+  },
   "templates": "./templates",
-  "languages": "./languages",
-  "acpScripts": []
+  "languages": "./languages"
 }

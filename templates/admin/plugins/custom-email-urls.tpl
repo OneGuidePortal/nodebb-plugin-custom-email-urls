@@ -170,21 +170,3 @@
 		</form>
 	</div>
 </div>
-
-<script>
-	require(['settings'], function (Settings) {
-		Settings.load('custom-email-urls', $('.custom-email-urls-settings'));
-
-		$('#save').on('click', function () {
-			Settings.save('custom-email-urls', $('.custom-email-urls-settings'), function () {
-				app.alert({
-					type: 'success',
-					alert_id: 'custom-email-urls-saved',
-					title: 'Settings Saved',
-					message: 'Custom Email URLs settings have been saved successfully.',
-					timeout: 3000
-				});
-			});
-		});
-	});
-</script>

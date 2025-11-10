@@ -1,6 +1,6 @@
 {
   "name": "nodebb-plugin-custom-email-urls",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "NodeBB plugin to rewrite email URLs to point to custom frontend (React, Vue, etc.) instead of NodeBB UI",
   "main": "library.js",
   "scripts": {

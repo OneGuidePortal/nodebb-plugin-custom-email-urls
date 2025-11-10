@@ -14,11 +14,11 @@ plugin.rewriteEmailUrls = async function (data) {
 
 		// Get the custom frontend URL from settings
 		const customFrontendUrl = settings.customFrontendUrl;
-		const nodebbUrl = settings.nodebbUrl || meta.config.url;
+		// Use nodebbUrl from settings if provided and not empty, otherwise use meta.config.url
+		const nodebbUrl = (settings.nodebbUrl && settings.nodebbUrl.trim()) ? settings.nodebbUrl.trim() : meta.config.url;
 
-		// If no custom URL is configured, return the original data
-		if (!customFrontendUrl) {
-			winston.warn('[plugin/custom-email-urls] No custom frontend URL configured. Skipping URL rewrite.');
+		// If no custom URL is configured, just pass through without rewriting
+		if (!customFrontendUrl || !customFrontendUrl.trim() || !nodebbUrl || typeof nodebbUrl !== 'string') {
 			return data;
 		}
 
@@ -33,9 +33,9 @@ plugin.rewriteEmailUrls = async function (data) {
 			data.subject = replaceUrls(data.subject, fromUrl, toUrl, settings);
 		}
 
-		// Rewrite URLs in text content
-		if (data.text) {
-			data.text = replaceUrls(data.text, fromUrl, toUrl, settings);
+		// Rewrite URLs in plaintext content
+		if (data.plaintext) {
+			data.plaintext = replaceUrls(data.plaintext, fromUrl, toUrl, settings);
 		}
 
 		// Rewrite URLs in HTML content
