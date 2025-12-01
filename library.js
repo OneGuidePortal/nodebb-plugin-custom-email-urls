@@ -85,24 +85,29 @@ async function replaceUrls(content, fromUrl, toUrl, settings) {
 			continue;
 		}
 
-		// Simple path replacement
-		const patterns = [
-			new RegExp(`${escapeRegex(fromUrl)}${escapeRegex(nodebbPath)}([?&#]|$)`, 'g'),
-			new RegExp(`(href=["'])${escapeRegex(fromUrl)}${escapeRegex(nodebbPath)}([?&#"'])`, 'g'),
-		];
-
-		patterns.forEach((pattern, index) => {
-			if (index === 0) {
-				result = result.replace(pattern, `${toUrl}${customPath}$1`);
-			} else {
-				result = result.replace(pattern, `$1${toUrl}${customPath}$2`);
-			}
-		});
+		// Replace NodeBB path with custom path, preserving everything after the path
+		// Match: fromUrl + nodebbPath + (rest of URL)
+		const urlPattern = new RegExp(
+			`${escapeRegex(fromUrl)}${escapeRegex(nodebbPath)}`,
+			'g'
+		);
+		result = result.replace(urlPattern, `${toUrl}${customPath}`);
 	}
 
-	// DO NOT use a blanket fallback - it corrupts asset URLs and external images
-	// Only the specific paths defined in urlMappings should be rewritten
-	// Assets like /assets/, /plugins/, /uploads/ should remain unchanged
+	// Smart fallback: Replace remaining NodeBB URLs that aren't assets
+	// This catches any URLs not handled by specific path mappings above
+	// But excludes asset paths to prevent image/file corruption
+	const assetPaths = ['/assets/', '/plugins/', '/uploads/', '/sounds/', '/language/', '/css/', '/javascript/'];
+
+	// Build a regex that matches fromUrl but NOT when followed by asset paths
+	// Negative lookahead to exclude asset URLs
+	const assetPathsPattern = assetPaths.map(escapeRegex).join('|');
+	const smartFallbackPattern = new RegExp(
+		`${escapeRegex(fromUrl)}(?!(?:${assetPathsPattern}))`,
+		'g'
+	);
+
+	result = result.replace(smartFallbackPattern, toUrl);
 
 	return result;
 }

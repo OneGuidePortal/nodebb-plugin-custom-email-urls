@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.5] - 2025-11-06
+
+### Fixed
+- **CRITICAL FIX**: Restored URL rewriting functionality that was broken in 0.2.4
+- Added smart fallback with negative lookahead to exclude asset paths
+- All page URLs now correctly rewrite to custom frontend
+- Asset URLs (images, CSS, JS) remain pointing to NodeBB backend
+
+### Changed
+- Improved URL pattern matching to handle all URL formats
+- Better regex logic with negative lookahead for asset exclusion
+
 ## [0.2.4] - 2025-11-06
 
 ### Fixed
