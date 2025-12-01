@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.4] - 2025-11-06
+
+### Fixed
+- **CRITICAL FIX**: Removed blanket URL fallback that was corrupting asset URLs and images
+- Asset URLs like `/assets/uploads/` now remain unchanged and point to NodeBB backend
+- External image URLs (e.g., Google user content) are no longer corrupted
+- Only specific page paths (topics, categories, users, etc.) are now rewritten
+
+### Changed
+- Reduced logging verbosity for production (changed `winston.info` to `winston.verbose`)
+- Improved code quality and removed all linting warnings
+- Optimized string replacement logic with global regex flags
+- Better input validation and error handling
+- Cleaned up unused code and variables
+
+### Improved
+- Production-ready code with cleaner logging
+- More efficient URL pattern replacement
+- Better separation of verbose logging from production logs
+
 ## [0.1.1] - 2025-11-06
 
 ### Changed

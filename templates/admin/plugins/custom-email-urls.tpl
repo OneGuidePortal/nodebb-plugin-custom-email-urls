@@ -21,146 +21,109 @@
 			</div>
 
 			<div class="form-group">
-				<label>Custom URL Mappings</label>
+				<label>URL Transformation Patterns</label>
 				<p class="help-block">
-					Map NodeBB paths to your custom frontend paths. Leave empty to use the same path.
+					Configure how NodeBB URLs are transformed to your custom frontend URLs. Use the available variables shown below.
+					<br><strong>Leave empty to use simple path replacement (domain swap only).</strong>
 				</p>
 
 				<div class="url-mappings-container">
-					<div class="row mapping-header" style="font-weight: bold; margin-bottom: 10px;">
-						<div class="col-sm-5">NodeBB Path</div>
-						<div class="col-sm-5">Custom Frontend Path</div>
-					</div>
-
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/topic/" readonly style="background-color: #f5f5f5;">
+					<!-- Topics Section -->
+					<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+						<div style="margin-bottom: 10px;">
+							<strong style="font-size: 14px;">Topics</strong>
+							<span style="margin-left: 15px; color: #666;">NodeBB Format: <code>/topic/{topic_id}/{topic_slug}</code></span>
 						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_topic" class="form-control" placeholder="/topic/" value="{mapping_topic}">
+						<div style="margin-bottom: 8px;">
+							<label style="font-weight: normal; margin-bottom: 3px;">Custom URL Pattern:</label>
+							<input type="text" name="mapping_topic" class="form-control" placeholder="/topic/{topic_id}/{topic_slug}" value="{mapping_topic}">
 						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Topic pages</span>
-						</div>
-					</div>
-
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/post/" readonly style="background-color: #f5f5f5;">
-						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_post" class="form-control" placeholder="/post/" value="{mapping_post}">
-						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Post links</span>
+						<div style="background-color: #f5f5f5; padding: 8px; border-radius: 3px;">
+							<small><strong>Available variables:</strong> <code>{tid}</code> = topic_id, <code>{cid}</code> = category_id, <code>{slug}</code> = topic_slug</small>
+							<br><small style="color: #666;"><strong>Example:</strong> <code>/topic/{cid}/{tid}</code> to get /topic/1/24 format</small>
 						</div>
 					</div>
 
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/user/" readonly style="background-color: #f5f5f5;">
+					<!-- Categories Section -->
+					<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+						<div style="margin-bottom: 10px;">
+							<strong style="font-size: 14px;">Categories</strong>
+							<span style="margin-left: 15px; color: #666;">NodeBB Format: <code>/category/{category_id}/{category_slug}</code></span>
 						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_user" class="form-control" placeholder="/user/" value="{mapping_user}">
+						<div style="margin-bottom: 8px;">
+							<label style="font-weight: normal; margin-bottom: 3px;">Custom URL Pattern:</label>
+							<input type="text" name="mapping_category" class="form-control" placeholder="/category/{category_id}/{category_slug}" value="{mapping_category}">
 						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">User profiles</span>
-						</div>
-					</div>
-
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/category/" readonly style="background-color: #f5f5f5;">
-						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_category" class="form-control" placeholder="/category/" value="{mapping_category}">
-						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Categories</span>
+						<div style="background-color: #f5f5f5; padding: 8px; border-radius: 3px;">
+							<small><strong>Available variables:</strong> <code>{cid}</code> = category_id, <code>{slug}</code> = category_slug</small>
+							<br><small style="color: #666;"><strong>Example:</strong> <code>/category/{cid}</code> to remove the slug</small>
 						</div>
 					</div>
 
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/notifications" readonly style="background-color: #f5f5f5;">
+					<!-- Users Section -->
+					<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+						<div style="margin-bottom: 10px;">
+							<strong style="font-size: 14px;">Users</strong>
+							<span style="margin-left: 15px; color: #666;">NodeBB Format: <code>/user/{username}</code></span>
 						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_notifications" class="form-control" placeholder="/notifications" value="{mapping_notifications}">
+						<div style="margin-bottom: 8px;">
+							<label style="font-weight: normal; margin-bottom: 3px;">Custom URL Pattern:</label>
+							<input type="text" name="mapping_user" class="form-control" placeholder="/user/{username}" value="{mapping_user}">
 						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Notifications</span>
-						</div>
-					</div>
-
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/unsubscribe/" readonly style="background-color: #f5f5f5;">
-						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_unsubscribe" class="form-control" placeholder="/unsubscribe/" value="{mapping_unsubscribe}">
-						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Unsubscribe</span>
+						<div style="background-color: #f5f5f5; padding: 8px; border-radius: 3px;">
+							<small><strong>Available variables:</strong> <code>{userslug}</code> = username, <code>{uid}</code> = user_id</small>
+							<br><small style="color: #666;"><strong>Example:</strong> <code>/profile/{userslug}</code> to change the path</small>
 						</div>
 					</div>
 
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/reset/" readonly style="background-color: #f5f5f5;">
+					<!-- Posts Section -->
+					<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+						<div style="margin-bottom: 10px;">
+							<strong style="font-size: 14px;">Posts</strong>
+							<span style="margin-left: 15px; color: #666;">NodeBB Format: <code>/post/{post_id}</code></span>
 						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_reset" class="form-control" placeholder="/reset/" value="{mapping_reset}">
+						<div style="margin-bottom: 8px;">
+							<label style="font-weight: normal; margin-bottom: 3px;">Custom URL Pattern:</label>
+							<input type="text" name="mapping_post" class="form-control" placeholder="/post/{post_id}" value="{mapping_post}">
 						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Password reset</span>
-						</div>
-					</div>
-
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/register" readonly style="background-color: #f5f5f5;">
-						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_register" class="form-control" placeholder="/register" value="{mapping_register}">
-						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Registration</span>
+						<div style="background-color: #f5f5f5; padding: 8px; border-radius: 3px;">
+							<small><strong>Note:</strong> Simple path replacement only (no variable substitution)</small>
 						</div>
 					</div>
 
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/login" readonly style="background-color: #f5f5f5;">
+					<!-- Other Pages Section -->
+					<div style="border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 4px;">
+						<div style="margin-bottom: 10px;">
+							<strong style="font-size: 14px;">Other Pages</strong>
+							<span style="margin-left: 15px; color: #666;">Static paths (simple replacements)</span>
 						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_login" class="form-control" placeholder="/login" value="{mapping_login}">
-						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Login page</span>
-						</div>
-					</div>
+						<div class="row">
+							<div class="col-sm-6">
+								<label style="font-weight: normal; margin-bottom: 3px;">Notifications:</label>
+								<input type="text" name="mapping_notifications" class="form-control" placeholder="/notifications" value="{mapping_notifications}" style="margin-bottom: 10px;">
 
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/tags/" readonly style="background-color: #f5f5f5;">
-						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_tags" class="form-control" placeholder="/tags/" value="{mapping_tags}">
-						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Tag pages</span>
-						</div>
-					</div>
+								<label style="font-weight: normal; margin-bottom: 3px;">Unsubscribe:</label>
+								<input type="text" name="mapping_unsubscribe" class="form-control" placeholder="/unsubscribe/" value="{mapping_unsubscribe}" style="margin-bottom: 10px;">
 
-					<div class="mapping-row row" style="margin-bottom: 10px;">
-						<div class="col-sm-5">
-							<input type="text" class="form-control" value="/groups/" readonly style="background-color: #f5f5f5;">
+								<label style="font-weight: normal; margin-bottom: 3px;">Password Reset:</label>
+								<input type="text" name="mapping_reset" class="form-control" placeholder="/reset/" value="{mapping_reset}" style="margin-bottom: 10px;">
+							</div>
+							<div class="col-sm-6">
+								<label style="font-weight: normal; margin-bottom: 3px;">Registration:</label>
+								<input type="text" name="mapping_register" class="form-control" placeholder="/register" value="{mapping_register}" style="margin-bottom: 10px;">
+
+								<label style="font-weight: normal; margin-bottom: 3px;">Login:</label>
+								<input type="text" name="mapping_login" class="form-control" placeholder="/login" value="{mapping_login}" style="margin-bottom: 10px;">
+
+								<label style="font-weight: normal; margin-bottom: 3px;">Tags:</label>
+								<input type="text" name="mapping_tags" class="form-control" placeholder="/tags/" value="{mapping_tags}" style="margin-bottom: 10px;">
+							</div>
 						</div>
-						<div class="col-sm-5">
-							<input type="text" name="mapping_groups" class="form-control" placeholder="/groups/" value="{mapping_groups}">
-						</div>
-						<div class="col-sm-2">
-							<span class="help-block" style="margin: 0; line-height: 34px;">Group pages</span>
+						<div class="row">
+							<div class="col-sm-6">
+								<label style="font-weight: normal; margin-bottom: 3px;">Groups:</label>
+								<input type="text" name="mapping_groups" class="form-control" placeholder="/groups/" value="{mapping_groups}">
+							</div>
 						</div>
 					</div>
 				</div>

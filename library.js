@@ -2,6 +2,7 @@
 
 const meta = require.main.require('./src/meta');
 const winston = require.main.require('winston');
+const topics = require.main.require('./src/topics');
 
 const plugin = {};
 
@@ -17,33 +18,31 @@ plugin.rewriteEmailUrls = async function (data) {
 		// Use nodebbUrl from settings if provided and not empty, otherwise use meta.config.url
 		const nodebbUrl = (settings.nodebbUrl && settings.nodebbUrl.trim()) ? settings.nodebbUrl.trim() : meta.config.url;
 
-		winston.info(`[plugin/custom-email-urls] Hook called - customFrontendUrl: ${customFrontendUrl}, nodebbUrl: ${nodebbUrl}, meta.config.url: ${meta.config.url}`);
-
-		// If no custom URL is configured, just pass through without rewriting
+		// If no custom URL is configured, pass through without rewriting
 		if (!customFrontendUrl || !customFrontendUrl.trim() || !nodebbUrl || typeof nodebbUrl !== 'string') {
-			winston.warn('[plugin/custom-email-urls] Skipping URL rewrite - configuration missing or invalid');
+			winston.verbose('[plugin/custom-email-urls] Skipping URL rewrite - configuration missing or invalid');
 			return data;
 		}
 
 		// Ensure URLs don't have trailing slashes
 		const fromUrl = nodebbUrl.replace(/\/$/, '');
-		const toUrl = customFrontendUrl.replace(/\/$/, '');
+		const toUrl = customFrontendUrl.trim().replace(/\/$/, '');
 
-		winston.info(`[plugin/custom-email-urls] Rewriting URLs from ${fromUrl} to ${toUrl}`);
+		winston.verbose(`[plugin/custom-email-urls] Rewriting URLs from ${fromUrl} to ${toUrl}`);
 
 		// Rewrite URLs in subject
 		if (data.subject) {
-			data.subject = replaceUrls(data.subject, fromUrl, toUrl, settings);
+			data.subject = await replaceUrls(data.subject, fromUrl, toUrl, settings);
 		}
 
 		// Rewrite URLs in plaintext content
 		if (data.plaintext) {
-			data.plaintext = replaceUrls(data.plaintext, fromUrl, toUrl, settings);
+			data.plaintext = await replaceUrls(data.plaintext, fromUrl, toUrl, settings);
 		}
 
 		// Rewrite URLs in HTML content
 		if (data.html) {
-			data.html = replaceUrls(data.html, fromUrl, toUrl, settings);
+			data.html = await replaceUrls(data.html, fromUrl, toUrl, settings);
 		}
 
 		return data;
@@ -54,41 +53,149 @@ plugin.rewriteEmailUrls = async function (data) {
 };
 
 /**
- * Replace NodeBB URLs with custom frontend URLs
+ * Replace NodeBB URLs with custom frontend URLs using pattern-based transformations
  */
-function replaceUrls(content, fromUrl, toUrl, settings) {
+async function replaceUrls(content, fromUrl, toUrl, settings) {
 	if (!content || typeof content !== 'string') {
 		return content;
 	}
 
-	// Define URL mappings for different NodeBB paths
-	// Use individual mapping fields if available, otherwise fall back to urlMappings textarea
-	const urlMappings = buildUrlMappings(settings);
-
-	// Apply custom mappings
 	let result = content;
+
+	// Handle topic URLs with pattern transformation
+	if (settings.mapping_topic && settings.mapping_topic.includes('{')) {
+		result = await transformUrlPattern(result, fromUrl, toUrl, settings.mapping_topic, 'topic');
+	}
+
+	// Handle category URLs with pattern transformation
+	if (settings.mapping_category && settings.mapping_category.includes('{')) {
+		result = await transformUrlPattern(result, fromUrl, toUrl, settings.mapping_category, 'category');
+	}
+
+	// Handle user URLs with pattern transformation
+	if (settings.mapping_user && settings.mapping_user.includes('{')) {
+		result = await transformUrlPattern(result, fromUrl, toUrl, settings.mapping_user, 'user');
+	}
+
+	// Apply simple path replacements for URLs without patterns
+	const urlMappings = buildUrlMappings(settings);
 	for (const [nodebbPath, customPath] of Object.entries(urlMappings)) {
-		// Match both plain URLs and URLs in href attributes
+		// Skip if this path uses pattern transformation (has placeholders)
+		if (customPath && customPath.includes('{')) {
+			continue;
+		}
+
+		// Simple path replacement
 		const patterns = [
-			// Plain URLs (with word boundaries)
 			new RegExp(`${escapeRegex(fromUrl)}${escapeRegex(nodebbPath)}([?&#]|$)`, 'g'),
-			// URLs in href attributes
 			new RegExp(`(href=["'])${escapeRegex(fromUrl)}${escapeRegex(nodebbPath)}([?&#"'])`, 'g'),
 		];
 
 		patterns.forEach((pattern, index) => {
 			if (index === 0) {
-				// Plain URL replacement
 				result = result.replace(pattern, `${toUrl}${customPath}$1`);
 			} else {
-				// href attribute replacement
 				result = result.replace(pattern, `$1${toUrl}${customPath}$2`);
 			}
 		});
 	}
 
-	// Fallback: replace any remaining instances of the base NodeBB URL
-	result = result.replace(new RegExp(escapeRegex(fromUrl), 'g'), toUrl);
+	// DO NOT use a blanket fallback - it corrupts asset URLs and external images
+	// Only the specific paths defined in urlMappings should be rewritten
+	// Assets like /assets/, /plugins/, /uploads/ should remain unchanged
+
+	return result;
+}
+
+/**
+ * Transform URLs using custom patterns with placeholders like {tid}, {cid}, {slug}
+ */
+async function transformUrlPattern(content, fromUrl, toUrl, customPattern, entityType) {
+	winston.verbose(`[plugin/custom-email-urls] Transforming ${entityType} URLs with pattern: ${customPattern}`);
+
+	// Build regex to match NodeBB URLs and extract IDs/slugs
+	let nodebbPattern;
+	let extractIds;
+
+	if (entityType === 'topic') {
+		// Match /topic/123/slug-text or /topic/123
+		nodebbPattern = new RegExp(
+			`${escapeRegex(fromUrl)}/topic/(\\d+)(?:/([^\\s"'<>/?#]+))?`,
+			'g'
+		);
+		extractIds = (matches) => [...new Set(matches.map(m => m[1]))]; // Extract unique tids
+	} else if (entityType === 'category') {
+		// Match /category/123/slug-text or /category/123
+		nodebbPattern = new RegExp(
+			`${escapeRegex(fromUrl)}/category/(\\d+)(?:/([^\\s"'<>/?#]+))?`,
+			'g'
+		);
+		extractIds = (matches) => [...new Set(matches.map(m => m[1]))]; // Extract unique cids
+	} else if (entityType === 'user') {
+		// Match /user/username
+		nodebbPattern = new RegExp(
+			`${escapeRegex(fromUrl)}/user/([^\\s"'<>/?#]+)`,
+			'g'
+		);
+		extractIds = (matches) => [...new Set(matches.map(m => m[1]))]; // Extract unique userslug
+	} else {
+		return content;
+	}
+
+	const matches = [...content.matchAll(nodebbPattern)];
+	if (matches.length === 0) {
+		return content;
+	}
+
+	const ids = extractIds(matches);
+	winston.verbose(`[plugin/custom-email-urls] Found ${ids.length} unique ${entityType} URLs`);
+
+	// Fetch additional data if pattern requires it (e.g., {cid} for topics)
+	let dataMap = {};
+	try {
+		if (entityType === 'topic' && customPattern.includes('{cid}')) {
+			// Fetch category IDs for topics
+			const topicData = await topics.getTopicsFields(ids, ['tid', 'cid', 'slug']);
+			topicData.forEach((topic) => {
+				if (topic && topic.tid) {
+					dataMap[topic.tid] = topic;
+				}
+			});
+		} else if (entityType === 'topic') {
+			// Just get slug if needed
+			const topicData = await topics.getTopicsFields(ids, ['tid', 'slug']);
+			topicData.forEach((topic) => {
+				if (topic && topic.tid) {
+					dataMap[topic.tid] = topic;
+				}
+			});
+		}
+	} catch (err) {
+		winston.error(`[plugin/custom-email-urls] Error fetching ${entityType} data:`, err);
+		return content; // Return original content if database lookup fails
+	}
+
+	// Replace URLs with custom pattern
+	const result = content.replace(nodebbPattern, (_match, id, slug) => {
+		const data = dataMap[id] || {};
+
+		// Build replacement URL by substituting placeholders
+		let newPath = customPattern;
+
+		if (entityType === 'topic') {
+			newPath = newPath.replace(/{tid}/g, id);
+			newPath = newPath.replace(/{cid}/g, data.cid || '');
+			newPath = newPath.replace(/{slug}/g, slug || data.slug || '');
+		} else if (entityType === 'category') {
+			newPath = newPath.replace(/{cid}/g, id);
+			newPath = newPath.replace(/{slug}/g, slug || '');
+		} else if (entityType === 'user') {
+			newPath = newPath.replace(/{userslug}/g, id);
+			newPath = newPath.replace(/{uid}/g, data.uid || '');
+		}
+
+		return `${toUrl}${newPath}`;
+	});
 
 	return result;
 }
@@ -147,29 +254,6 @@ function buildUrlMappings(settings) {
 }
 
 /**
- * Parse custom URL mappings from settings
- * Format: nodebb_path=custom_path (one per line)
- */
-function parseUrlMappings(mappingsString) {
-	const mappings = getDefaultUrlMappings();
-
-	if (!mappingsString || typeof mappingsString !== 'string') {
-		return mappings;
-	}
-
-	const lines = mappingsString.split('\n').filter(line => line.trim());
-
-	for (const line of lines) {
-		const [nodebbPath, customPath] = line.split('=').map(s => s.trim());
-		if (nodebbPath && customPath) {
-			mappings[nodebbPath] = customPath;
-		}
-	}
-
-	return mappings;
-}
-
-/**
  * Escape special regex characters
  */
 function escapeRegex(string) {
@@ -195,7 +279,7 @@ plugin.addAdminNavigation = async function (header) {
 plugin.init = function (params, callback) {
 	const { router, middleware } = params;
 
-	const renderAdmin = function (req, res) {
+	const renderAdmin = function (_req, res) {
 		res.render('admin/plugins/custom-email-urls', {
 			title: 'Custom Email URLs',
 		});
